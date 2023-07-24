@@ -8,8 +8,7 @@ const generateToken = (payload) => {
 }
 
 const decryptToken = (token) => {
-    const bearerRemoved = token.split(' ')[1]
-    const decoded = jwt.verify(bearerRemoved, process.env.TOKEN_SECRET)
+    const decoded = jwt.verify(token, process.env.TOKEN_SECRET)
     return decoded
 }
 
