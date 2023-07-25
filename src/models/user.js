@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
 const passwordHasher = require('../helpers/passwordHash')
+const uniqueValidator = require('mongoose-unique-validator')
 
 const UserSchema = new mongoose.Schema(
     {
@@ -32,7 +32,7 @@ UserSchema.pre('save', async function (next) {
     // Hash the password
     const [salt, hash] = await passwordHasher.encyptPassword(user.password)
     user.salt = salt
-    user.hash = hash
+    user.password = hash
     next()
 })
 

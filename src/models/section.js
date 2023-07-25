@@ -1,10 +1,12 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
 const SectionSchema = new mongoose.Schema(
     {
-        label: { type: String, required: true, unique: true },
+        name: { type: String, required: true },
+        label: { type: String, required: true },
         description: String,
-        identifying_subject_ids: [Number],
+        subject_ids: [mongoose.Schema.Types.Number],
     },
     { timestamps: true }
 )

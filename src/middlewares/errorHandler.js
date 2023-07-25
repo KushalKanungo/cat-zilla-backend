@@ -4,9 +4,12 @@ const errorHandler = (err, req, res, next) => {
     if (err.name === 'ValidationError') {
         res.status(400).json({ message: err.message })
     } else if (err.code === 11000) {
-        console.log(err)
+        const fieldNames = Object.keys(err.keyPattern)
+        const errorMessages = fieldNames.map((field) => {
+            return `${err.keyValue[field]} ${field} already exists.`
+        })
         res.status(400).json({
-            message: 'Email already used.',
+            message: errorMessages.join('\n'),
         })
     } else {
         res.status(err.statusCode).json({
