@@ -2,6 +2,11 @@ const mongoose = require('mongoose')
 
 const QuestionPaperSchema = new mongoose.Schema(
     {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Sections',
+            required: true,
+        },
         sections: [
             {
                 section: {
@@ -20,6 +25,7 @@ const QuestionPaperSchema = new mongoose.Schema(
                         timeTaken: Number,
                     },
                 ],
+                timeTake: Number,
             },
         ],
         timeTake: Number,

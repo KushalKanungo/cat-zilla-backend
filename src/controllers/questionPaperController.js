@@ -5,6 +5,7 @@ const Topic = require('../models/topic')
 const QuestionType = require('../models/questionType')
 const Question = require('../models/question')
 const QuestionPaper = require('../models/questionPaper')
+const QuestionPaperService = require('../services/questionPaperService')
 
 const addQuestionPaper = async (req, res, next) => {
     try {
@@ -41,6 +42,20 @@ const getQuestionPaper = async (req, res, next) => {
         next(error)
     }
 }
+
+const paper = async (req, res, next) => {
+    try {
+        const serializedData = await QuestionPaperService.questionPaperForTest(
+            req.body
+        )
+        console.log(serializedData)
+        res.json(serializedData)
+    } catch (error) {
+        next(error)
+    }
+}
+
+// PRIVATE FUNCTIONS
 
 const addQuestion = async (question, index, next) => {
     try {
@@ -151,4 +166,5 @@ const addQuestion = async (question, index, next) => {
 module.exports = {
     addQuestionPaper,
     getQuestionPaper,
+    paper,
 }
