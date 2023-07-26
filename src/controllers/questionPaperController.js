@@ -10,8 +10,8 @@ const addQuestionPaper = async (req, res, next) => {
     try {
         const { label, questions, description } = req.body
         let savedQuestions = []
-        for (const question of questions) {
-            const temp_ques = await addQuestion(question, next)
+        for (const [index, question] of questions.entries()) {
+            const temp_ques = await addQuestion(question, index, next)
             savedQuestions.push(temp_ques)
         }
 
@@ -42,13 +42,16 @@ const getQuestionPaper = async (req, res, next) => {
     }
 }
 
-const addQuestion = async (question, next) => {
+const addQuestion = async (question, index, next) => {
     try {
-        const { SubjectID, SubjectName } = question
-        const { AreaID, AreaName } = question
-        const { TopicID, TopicName } = question
-        const { ItemType } = question
         const {
+            SubjectID,
+            SubjectName,
+            AreaID,
+            AreaName,
+            TopicID,
+            TopicName,
+            ItemType,
             Items,
             Passage,
             Explanation,
@@ -58,6 +61,7 @@ const addQuestion = async (question, next) => {
             Difficulty,
             NegativePoints,
         } = question
+        const questionNo = index + 1
 
         // Subject
         let subject = await Subject.findOne({ label: SubjectName })
@@ -122,6 +126,7 @@ const addQuestion = async (question, next) => {
         // console.log(options)
         let newQuestion = new Question({
             question: Items,
+            questionNo,
             correctOption: CorrectIndex,
             marks: Points,
             negativeMarks: NegativePoints,

@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
 
 const QuestionSchema = new mongoose.Schema(
     {
         question: String,
+        questionNo: Number,
         difficulty: String,
         questionType: {
             type: mongoose.Schema.Types.ObjectId,
