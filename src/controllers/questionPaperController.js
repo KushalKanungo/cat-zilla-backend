@@ -36,7 +36,6 @@ const getQuestionPaper = async (req, res, next) => {
                 path: 'questions',
                 populate: [{ path: 'subject' }],
             })
-        console.log(questions)
         res.json(questions)
     } catch (error) {
         next(error)
@@ -48,7 +47,6 @@ const paper = async (req, res, next) => {
         const serializedData = await QuestionPaperService.questionPaperForTest(
             req.body
         )
-        console.log(serializedData)
         res.json(serializedData)
     } catch (error) {
         next(error)
@@ -120,7 +118,6 @@ const addQuestion = async (question, index, next) => {
         // Question Type
         let questionType = await QuestionType.findOne({ label: ItemType })
         if (!questionType) {
-            console.log(ItemType)
             questionType = new QuestionType({
                 label: ItemType,
             })
@@ -138,7 +135,6 @@ const addQuestion = async (question, index, next) => {
                 option: Options,
             })
         )
-        // console.log(options)
         let newQuestion = new Question({
             question: Items,
             questionNo,
@@ -156,7 +152,6 @@ const addQuestion = async (question, index, next) => {
             questionType,
         })
         await newQuestion.save()
-        // console.log(newQuestion._id)
         return newQuestion
     } catch (err) {
         return next(new Error(err))

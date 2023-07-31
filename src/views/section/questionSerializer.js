@@ -10,6 +10,7 @@ const questionWhileAttempt = (question) => {
         question: question.question,
         sectionId: question.section,
         quesType: question.questionType.label,
+        timeSpent: 0,
         options: question.options.map((option) => ({
             id: option.index,
             value: option.option,

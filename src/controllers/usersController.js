@@ -24,8 +24,6 @@ const signUp = async (req, res, next) => {
         await newUser.save()
         res.json({ newUser })
     } catch (err) {
-        // debugger
-        // console.log('catch')
         next(err)
     }
 }

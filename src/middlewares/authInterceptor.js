@@ -10,6 +10,7 @@ const setCurrentUser = async (req, res, next) => {
         if (decoded) {
             const user = await User.findOne({ _id: decoded.id })
             req.user = user
+            console.log(user.email)
             next()
         }
     } catch (err) {

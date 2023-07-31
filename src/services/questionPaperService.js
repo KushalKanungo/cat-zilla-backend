@@ -1,15 +1,22 @@
 const QuestionPaper = require('../models/questionPaper')
 const Section = require('../models/section')
-const { questionPaperForAttempt } = require('../views/questionPaperSerializer')
+const QuestionPaperSerializer = require('../views/questionPaperSerializer')
+const AttemptService = require('./attemptService')
 
 const questionPaperForTest = async ({ id, sections }) => {
     const sectionIds = sections.map((section) => section.id)
     const questionPaper = await fetchQuestions(id, sectionIds)
     const selectedSections = await Section.find({ _id: { $in: sectionIds } })
-    const serializedQuestionPaper = questionPaperForAttempt(
-        questionPaper,
-        selectedSections
-    )
+    const serializedQuestionPaper =
+        QuestionPaperSerializer.questionPaperForAttempt(
+            questionPaper,
+            selectedSections
+        )
+    // await AttemptService.createNewAttempt(
+    //     id,
+    //     sectionIds,
+    //     questionPaper.questions
+    // )
     return serializedQuestionPaper
 }
 
