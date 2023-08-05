@@ -8,6 +8,8 @@ const app = express()
 const userRouter = require('./src/routes/usersRoutes')
 const sectionsRouter = require('./src/routes/sectionsRoutes')
 const questionPaperRouter = require('./src/routes/questionPaperRoute')
+const questionRouter = require('./src/routes/questionRoute')
+const attemptRouter = require('./src/routes/attemptRoutes')
 const errorHandler = require('./src/middlewares/errorHandler')
 const { setCurrentUser } = require('./src/middlewares/authInterceptor')
 
@@ -23,6 +25,8 @@ app.use(cors())
 // <===== User Routes =====>
 app.use('/api/users', userRouter)
 app.use('/api/sections', sectionsRouter)
+app.use('/api/attempts', attemptRouter)
+app.use('/api/question', setCurrentUser, questionRouter)
 app.use('/api/question-paper', setCurrentUser, questionPaperRouter)
 
 app.use(errorHandler)

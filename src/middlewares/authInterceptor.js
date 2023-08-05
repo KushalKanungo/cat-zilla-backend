@@ -5,6 +5,10 @@ const ErrorHandler = require('../utils/errorHandeler')
 
 const setCurrentUser = async (req, res, next) => {
     try {
+        if (!req.headers.authorization) {
+            const err = new ErrorHandler('You are not authorized', 400)
+            next(err)
+        }
         var token = req.headers.authorization.split(' ')[1]
         const decoded = decryptToken(token)
         if (decoded) {

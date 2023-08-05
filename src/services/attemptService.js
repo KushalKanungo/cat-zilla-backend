@@ -18,6 +18,27 @@ const createNewAttempt = async (questionPaperId, sectionIds, allQuestions) => {
     await attempt.save()
 }
 
+const getResult = async (attemptId) => {
+    // debugger
+    const result = await AttemptModel.findById(attemptId).populate({
+        path: 'sections',
+        populate: [
+            'section',
+            {
+                path: 'questions',
+                populate: [
+                    'question',
+                    {
+                        path: 'question',
+                        populate: ['area', 'topic', 'subject', 'section'],
+                    },
+                ],
+            },
+        ],
+    })
+    return result
+}
+
 const findQuestionsFromSection = (questions, sectionId) => {
     return questions
         .filter((ques) => ques.section.toString() === sectionId)
@@ -26,4 +47,4 @@ const findQuestionsFromSection = (questions, sectionId) => {
         })
 }
 
-module.exports = { createNewAttempt }
+module.exports = { createNewAttempt, getResult }
