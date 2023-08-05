@@ -1,6 +1,14 @@
 const attempt = (attempt) => {
     let questions = []
+    let sections = []
     attempt.sections.forEach((section) => {
+        let tempSection = {
+            id: section.section._id,
+            timeSpent: section.timeSpent,
+            correct: 0,
+            total: 0,
+            unanswered: 0,
+        }
         section.questions.forEach((question) => {
             console.log(question.question.options, question.userResponse)
             const tempQuestion = {
@@ -14,14 +22,22 @@ const attempt = (attempt) => {
                 subjectId: question.question.subject._id,
                 // subjectName: question.question.subject.label,
                 timespent: question.timeSpent,
-                isCorrent:
+                isCorrect:
                     question.question.options[Number(question.userResponse)]
                         ?.isCorrect ?? null,
             }
             questions.push(tempQuestion)
+            tempSection.correct += tempQuestion.isCorrect ? 1 : 0
+            tempSection.unanswered += tempQuestion.isCorrect === null ? 1 : 0
+            tempSection.total += 1
         })
+        sections.push(tempSection)
     })
-    return questions
+    return {
+        id: attempt._id,
+        questions,
+        sections,
+    }
 }
 
 module.exports = { attempt }
