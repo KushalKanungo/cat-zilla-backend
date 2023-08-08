@@ -60,6 +60,7 @@ const getFirstAttemptedQuestion = async (req, res, next) => {
 const getResult = async (req, res, next) => {
     try {
         const result = await AttemptService.getResult(req.params.id)
+        console.log(result)
         const serialized = attemptSeializer.attempt(result)
         myCache.set(req.originalUrl, JSON.stringify(serialized))
         res.status(200).json(serialized)

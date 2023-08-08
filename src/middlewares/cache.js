@@ -1,7 +1,12 @@
 const myCache = require('../utils/cache')
 
-function cacheMiddleware(req, res, next) {
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function cacheMiddleware(req, res, next) {
     const cachedData = myCache.get(req.originalUrl)
+    await sleep(300)
     if (cachedData) {
         return res.json(JSON.parse(cachedData))
     }

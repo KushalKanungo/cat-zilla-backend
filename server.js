@@ -26,7 +26,7 @@ app.use(cors())
 app.use('/api/users', userRouter)
 app.use('/api/sections', sectionsRouter)
 app.use('/api/attempts', attemptRouter)
-app.use('/api/question', setCurrentUser, questionRouter)
+app.use('/api/question', questionRouter)
 app.use('/api/question-paper', setCurrentUser, questionPaperRouter)
 
 app.use(errorHandler)
