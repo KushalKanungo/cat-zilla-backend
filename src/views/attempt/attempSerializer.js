@@ -13,7 +13,27 @@ const attempt = (attempt) => {
             maximumMarks: 0,
         }
         section.questions.forEach((question) => {
-            console.log(question.question.options, question.userResponse)
+            let isCorrect
+            if (question['userResponse'] === null || question['userResponse'] === undefined) {
+                isCorrect = null
+            }
+            else if (question.question.questionType.label === 'MCQ') {
+                isCorrect = question.userResponse === null
+                    ? null
+                    : question.question.options[
+                        Number(question.userResponse)
+                    ]?.isCorrect
+            }
+            else { 
+                
+                const matches = question.question.options
+                    .find((option) => option.isCorrect)
+                    .option.match(/(\d+)/)
+                isCorrect = question.userResponse === null
+                    ? null
+                    : Number(question.userResponse) === Number(matches[0])
+            }
+
             const tempQuestion = {
                 id: question.question._id,
                 sectionId: question.question.section._id,
@@ -24,15 +44,11 @@ const attempt = (attempt) => {
                 areaId: question.question.area._id,
                 areaName: question.question.area.label,
                 subjectId: question.question.subject._id,
+                questionType: question.question.questionType.label ?? 'false', 
                 subjectName: question.question.subject.label,
                 timeSpent: question.timeSpent,
                 userResponse: question.userResponse ?? null,
-                isCorrect:
-                    question.userResponse === null
-                        ? null
-                        : question.question.options[
-                              Number(question.userResponse)
-                          ]?.isCorrect,
+                isCorrect: isCorrect
             }
             tempQuestion.marks = tempQuestion.isCorrect
                 ? question.question.marks
@@ -41,7 +57,7 @@ const attempt = (attempt) => {
                 : 0
             questions.push(tempQuestion)
             tempSection.correct += tempQuestion.isCorrect ? 1 : 0
-            tempSection.unanswered += tempQuestion.userResponse === null ? 1 : 0
+            tempSection.unanswered += tempQuestion.isCorrect === null ? 1 : 0
             tempSection.total += 1
             tempSection.marks += tempQuestion.marks
             tempSection.maximumMarks += question.question.marks

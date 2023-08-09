@@ -6,7 +6,7 @@ function sleep(ms) {
 
 async function cacheMiddleware(req, res, next) {
     const cachedData = myCache.get(req.originalUrl)
-    await sleep(300)
+    await sleep(1600)
     if (cachedData) {
         return res.json(JSON.parse(cachedData))
     }

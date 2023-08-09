@@ -30,7 +30,7 @@ const getResult = async (attemptId) => {
                     'question',
                     {
                         path: 'question',
-                        populate: ['area', 'topic', 'subject', 'section'],
+                        populate: ['area', 'topic', 'subject', 'section', 'questionType'],
                     },
                 ],
             },
