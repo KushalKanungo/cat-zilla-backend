@@ -18,4 +18,17 @@ const questionPaperForAttempt = (questionPaper, sections) => {
     }
 }
 
-module.exports = { questionPaperForAttempt }
+const questionPaperListing = (questionPapers, per, page, total) => {
+    const questions = questionPapers.map((questionPaper) => {
+        return {
+            id: questionPaper._id,
+            label: questionPaper.label,
+            questionsCount: questionPaper.questions.length,
+            description: questionPaper.description,
+            createdAt: questionPaper.createdAt,
+        }
+    })
+    return { questionPapers: questions, total, per, page }
+}
+
+module.exports = { questionPaperForAttempt, questionPaperListing }

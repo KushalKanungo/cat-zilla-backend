@@ -14,27 +14,6 @@ const getFirstAttemptedQuestion = async (req, res, next) => {
         timeSpent,
         userResponse,
     } = req.body
-    // await AttemptModel.findOneAndUpdate(
-    //     {
-    //         _id: attemptId,
-    //     },
-    //     {
-    //         $set: {
-    //             'sections.$[section].questions.$[question].userResponse':
-    //                 response,
-    //             'sections.$[section].questions.$[question].status': status,
-    //             'sections.$[section].questions.$[question].timeTaken':
-    //                 timeTaken,
-    //         },
-    //     },
-    //     {
-    //         new: true,
-    //         arrayFilters: [
-    //             { 'question.question': questionId },
-    //             { 'section.section': sectionId },
-    //         ],
-    //     }
-    // )
 
     await AttemptModel.findOneAndUpdate(
         { _id: attemptId },

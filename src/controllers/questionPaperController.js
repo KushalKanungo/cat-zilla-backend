@@ -6,6 +6,7 @@ const QuestionType = require('../models/questionType')
 const Question = require('../models/question')
 const QuestionPaper = require('../models/questionPaper')
 const QuestionPaperService = require('../services/questionPaperService')
+const QuestionPaperSerializer = require('../views/questionPaperSerializer')
 
 const addQuestionPaper = async (req, res, next) => {
     try {
@@ -30,13 +31,20 @@ const addQuestionPaper = async (req, res, next) => {
 
 const getQuestionPaper = async (req, res, next) => {
     try {
-        const questions = await QuestionPaper.findOne({})
-            .populate('questions')
-            .populate({
-                path: 'questions',
-                populate: [{ path: 'subject' }],
-            })
-        res.json(questions)
+        const { page = 1, per = 12 } = req.query
+        const total = await QuestionPaper.find({}).count()
+
+        const questions = await QuestionPaper.find({})
+            .skip((page - 1) * per)
+            .limit(per)
+        res.json(
+            QuestionPaperSerializer.questionPaperListing(
+                questions,
+                per,
+                page,
+                total
+            )
+        )
     } catch (error) {
         next(error)
     }

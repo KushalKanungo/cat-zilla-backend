@@ -27,7 +27,7 @@ app.use('/api/users', userRouter)
 app.use('/api/sections', sectionsRouter)
 app.use('/api/attempts', attemptRouter)
 app.use('/api/question', questionRouter)
-app.use('/api/question-paper', setCurrentUser, questionPaperRouter)
+app.use('/api/question-papers', questionPaperRouter)
 
 app.use(errorHandler)
 app.listen(3000)
