@@ -4,4 +4,6 @@ const sectionController = require('../controllers/sectionController')
 
 // <======= Index Route =====>
 router.post('/', sectionController.addSection)
+router.post('/subject', sectionController.addSubjectId)
+router.get('/', sectionController.getAllSections)
 module.exports = router

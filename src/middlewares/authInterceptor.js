@@ -14,13 +14,15 @@ const setCurrentUser = async (req, res, next) => {
         if (decoded) {
             const user = await User.findOne({ _id: decoded.id })
             req.user = user
-            console.log(user.email)
+            console.log(user._id)
             next()
         }
     } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
             const newToken = refreshExpiredToken(token)
-            return res.status(200).json({ accessToken: newToken })
+            // return res.status(401).json({ message: "Session Expired" })
+            return next(new ErrorHandler('Session Expired', 401))
+
         } else if (err instanceof jwt.JsonWebTokenError) {
             return next(new ErrorHandler('You are not authorized', 401))
         }

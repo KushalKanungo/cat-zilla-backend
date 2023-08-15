@@ -4,9 +4,15 @@ const questionPaperController = require('../controllers/questionPaperController'
 const attemptController = require('../controllers/attemptController')
 const { cacheMiddleware } = require('../middlewares/cache')
 
-// <======= Index Route =====>
+// <======= Get All Question Papers List Paginated =====>
 router.get('/', cacheMiddleware, questionPaperController.getQuestionPaper)
+
+// <============= Add a new question paper =============>
 router.post('/', questionPaperController.addQuestionPaper)
+
+// <=============  Start new paper attempts ============>
 router.post('/paper', questionPaperController.paper)
-router.post('/paper-answer', attemptController.getFirstAttemptedQuestion)
+
+// <========== Add a new response ============>
+router.post('/paper-response', attemptController.setResponse)
 module.exports = router

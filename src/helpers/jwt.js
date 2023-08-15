@@ -2,9 +2,11 @@ require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
 const generateToken = (payload) => {
-    return jwt.sign(payload, process.env.TOKEN_SECRET, {
-        expiresIn: process.env.TOKEN_EXPIRY_TIME,
-    })
+    if (process.env.EXPIRE_TOKEN === 'yes')
+        return jwt.sign(payload, process.env.TOKEN_SECRET, {
+            expiresIn: process.env.TOKEN_EXPIRY_TIME,
+        })
+    return jwt.sign(payload, process.env.TOKEN_SECRET)
 }
 
 const decryptToken = (token) => {

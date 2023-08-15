@@ -1,7 +1,8 @@
 const AttemptModel = require('../models/attempt')
 const mongoose = require('mongoose')
+const ErrorHandler = require('../utils/errorHandeler')
 
-const createNewAttempt = async (questionPaperId, sectionIds, allQuestions) => {
+const createNewAttempt = async (questionPaperId, sectionIds, userId, allQuestions) => {
     const sections = sectionIds.map((sectionId) => ({
         section: sectionId,
         questions: findQuestionsFromSection(allQuestions, sectionId),
@@ -10,12 +11,13 @@ const createNewAttempt = async (questionPaperId, sectionIds, allQuestions) => {
     // console.log(sections[0].questions)
 
     let attempt = new AttemptModel({
-        user: '64bcec0f271eaaef7297dc57',
+        user: userId,
         sections,
-        quesionPaper: questionPaperId,
+        questionPaper: questionPaperId,
     })
 
     await attempt.save()
+    return attempt.id
 }
 
 const getResult = async (attemptId) => {
@@ -36,7 +38,11 @@ const getResult = async (attemptId) => {
             },
         ],
     })
-    return result
+
+    if (result)
+        return result
+    else
+        throw new ErrorHandler('No result found', 404)
 }
 
 const findQuestionsFromSection = (questions, sectionId) => {

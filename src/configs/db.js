@@ -10,6 +10,7 @@ const connectDB = () => {
         .connect(MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            dbName: 'cat_zilla'
         })
         .then(() => {
             console.log('Connected to MongoDB')

@@ -12,7 +12,6 @@ const signUp = async (req, res, next) => {
     try {
         const { email, username, password, confirmPassword } = req.body
         if (password !== confirmPassword) {
-            console.log('before')
             const error = new ErrorHandler('Passwords do not match', 400)
             return next(error)
         }
@@ -30,9 +29,15 @@ const signUp = async (req, res, next) => {
 
 const signIn = async (req, res, next) => {
     try {
-        const { email, username, password } = req.query
-        const user = await User.find({ email, username }).limit(1)
-
+        const { email = null, username = null, password } = req.query
+        const searchQuery = {
+            $or: [
+              { email },
+              { username },
+            ],
+          }
+        const user = await User.find(searchQuery).limit(1)
+        console.log(user, email, username)
         if (user.length < 1 || password === undefined) {
             return next(
                 new ErrorHandler('Email or Password is incorrect.', 400)

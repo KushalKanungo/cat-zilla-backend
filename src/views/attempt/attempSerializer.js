@@ -17,7 +17,7 @@ const attempt = (attempt) => {
             if (question['userResponse'] === null || question['userResponse'] === undefined) {
                 isCorrect = null
             }
-            else if (question.question.questionType.label === 'MCQ') {
+            else if (question.question.questionType.label.toUpperCase() === 'MCQ') {
                 isCorrect = question.userResponse === null
                     ? null
                     : question.question.options[
@@ -28,10 +28,10 @@ const attempt = (attempt) => {
                 
                 const matches = question.question.options
                     .find((option) => option.isCorrect)
-                    .option.match(/(\d+)/)
+                    .option.match(/>(\d+)</)
                 isCorrect = question.userResponse === null
                     ? null
-                    : Number(question.userResponse) === Number(matches[0])
+                    : Number(question.userResponse) === Number(matches?.[1])
             }
 
             const tempQuestion = {
@@ -79,4 +79,22 @@ const attempt = (attempt) => {
     }
 }
 
-module.exports = { attempt }
+const attempListing = (attempts,
+    per,
+    page,
+    total) => {
+
+        const attemptsData = attempts.map((attempt) => {
+            return {
+                id: attempt._id,
+                label: attempt.label,
+                questionPaperName: attempt.questionPaper.label,
+                questionPaperId: attempt.questionPaper.id,
+                createdAt: attempt.createdAt,
+            }
+        })
+        return { attempts: attemptsData, total, per, page }
+
+}
+
+module.exports = { attempt, attempListing }

@@ -7,25 +7,48 @@ const Question = require('../models/question')
 const QuestionPaper = require('../models/questionPaper')
 const QuestionPaperService = require('../services/questionPaperService')
 const QuestionPaperSerializer = require('../views/questionPaperSerializer')
+const ErrorHandler = require('../utils/errorHandeler')
 
 const addQuestionPaper = async (req, res, next) => {
     try {
         const { label, questions, description } = req.body
+        let easy = 0
+        let medium = 0
+        let hard = 0
+        let unknown = 0
         let savedQuestions = []
         for (const [index, question] of questions.entries()) {
             const temp_ques = await addQuestion(question, index, next)
             savedQuestions.push(temp_ques)
+            switch (question.Difficulty.toLowerCase()) {
+                case 'easy':
+                    easy += 1
+                    break
+                case 'medium':
+                    medium += 1
+                    break
+                case 'difficult':
+                    hard += 1
+                    break
+                default:
+                    unknown += 1
+            }
         }
 
         const questionPaper = new QuestionPaper({
             questions: savedQuestions,
             label,
             description,
+            easy,
+            medium,
+            hard,
+            unknown,
         })
         await questionPaper.save()
         res.status(201).json({ message: 'Question paper added successfully. ' })
     } catch (err) {
-        return next(err)
+        const error = new ErrorHandler('File is not valid', 400)
+        return next(error)
     }
 }
 
@@ -34,7 +57,10 @@ const getQuestionPaper = async (req, res, next) => {
         const { page = 1, per = 12 } = req.query
         const total = await QuestionPaper.find({}).count()
 
-        const questions = await QuestionPaper.find({})
+        const questions = await QuestionPaper.find({}).populate({
+            path: 'attempts',
+            match: { user: req.user._id }
+          })
             .skip((page - 1) * per)
             .limit(per)
         res.json(
@@ -53,7 +79,7 @@ const getQuestionPaper = async (req, res, next) => {
 const paper = async (req, res, next) => {
     try {
         const serializedData = await QuestionPaperService.questionPaperForTest(
-            req.body
+            {...req.body, user: req.user}
         )
         res.json(serializedData)
     } catch (error) {

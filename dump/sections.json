@@ -1,0 +1,38 @@
+[{
+  "name": "Verbal",
+  "label": "Verbal & Reading",
+  "description": "Passages and other related to english",
+  "subject_ids": [
+    203,
+    {
+      "$numberLong": "1589191865762"
+    }
+  ]
+},{
+  "name": "Reasoning",
+  "label": "Data Inter. & Logical Res.",
+  "description": "Logical Reasing Some mind tricks",
+  "subject_ids": [
+    454,
+    7,
+    200,
+    205,
+    207,
+    {
+      "$numberLong": "1589192069884"
+    },
+    {
+      "$numberLong": "1588684116766"
+    }
+  ]
+},{
+  "name": "Quantative",
+  "label": "Quantative Analysis",
+  "description": "Maths and good kowledge of numbers.",
+  "subject_ids": [
+    427,
+    {
+      "$numberLong": "1588684115265"
+    }
+  ]
+}]

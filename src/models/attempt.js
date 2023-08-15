@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const StatusEnum = require('../_enums/status')
+const QuestionPaperModel = require('./questionPaper')
 
 const QuestionSchema = new mongoose.Schema(
     {
@@ -39,16 +40,34 @@ const AttemptSchema = new mongoose.Schema(
             ref: 'Users',
             required: true,
         },
-        quesionPaper: {
+        questionPaper: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'QuestionPapers',
             required: true,
         },
         sections: [SectionSchema],
         startTime: Date,
-        status: { type: String, default: StatusEnum.NOT_STARTED },
+        status: { type: String, default: StatusEnum.IN_PROGRESS },
         timeSpent: { type: Number, default: 0 },
     },
     { timestamps: true }
 )
-module.exports = mongoose.model('Attemtps', AttemptSchema)
+
+
+AttemptSchema.post('save', async function (doc, next) {
+    const attempt = doc
+    await QuestionPaperModel.updateOne({ _id: attempt.questionPaper }, { $push: { attempts: attempt._id } })
+    next()
+})
+
+
+AttemptSchema.post('findOneAndDelete', async function (doc, next) {
+    const attempt = doc
+    await QuestionPaperModel.updateOne({ _id: attempt.questionPaper }, { $pull: { attempts: attempt._id } })
+    next()
+})
+
+
+
+
+module.exports = mongoose.model('Attempts', AttemptSchema)
