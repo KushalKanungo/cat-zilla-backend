@@ -12,6 +12,7 @@ const questionRouter = require('./src/routes/questionRoute')
 const attemptRouter = require('./src/routes/attemptRoutes')
 const errorHandler = require('./src/middlewares/errorHandler')
 const { setCurrentUser } = require('./src/middlewares/authInterceptor')
+const { cacheMiddleware } = require('./src/middlewares/cache')
 
 connectDB()
 
@@ -25,7 +26,7 @@ app.use(cors())
 // <===== User Routes =====>
 app.use('/api/users', userRouter)
 app.use('/api/sections',setCurrentUser ,sectionsRouter)
-app.use('/api/attempts',setCurrentUser ,attemptRouter)
+app.use('/api/attempts',setCurrentUser, cacheMiddleware, attemptRouter)
 app.use('/api/question',setCurrentUser ,questionRouter)
 app.use('/api/question-papers',setCurrentUser ,questionPaperRouter)
 
