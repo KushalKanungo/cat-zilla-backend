@@ -14,6 +14,7 @@ const attempt = (attempt) => {
         }
         section.questions.forEach((question) => {
             let isCorrect
+            console.log(question.question.questionType);
             if (question['userResponse'] === null || question['userResponse'] === undefined) {
                 isCorrect = null
             }

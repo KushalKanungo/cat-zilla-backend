@@ -12,6 +12,7 @@ const questionRouter = require('./src/routes/questionRoute')
 const attemptRouter = require('./src/routes/attemptRoutes')
 const errorHandler = require('./src/middlewares/errorHandler')
 const { setCurrentUser } = require('./src/middlewares/authInterceptor')
+const { cacheMiddleware } = require('./src/middlewares/cache')
 
 connectDB()
 
@@ -23,11 +24,13 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }))
 
 app.use(cors())
 // <===== User Routes =====>
-app.use('/api/users', userRouter)
+app.use('/api/users', cacheMiddleware ,userRouter)
 app.use('/api/sections',setCurrentUser ,sectionsRouter)
-app.use('/api/attempts',setCurrentUser ,attemptRouter)
-app.use('/api/question',setCurrentUser ,questionRouter)
+app.use('/api/attempts',setCurrentUser, cacheMiddleware, attemptRouter)
+app.use('/api/question',setCurrentUser, cacheMiddleware, questionRouter)
 app.use('/api/question-papers',setCurrentUser ,questionPaperRouter)
 
 app.use(errorHandler)
-app.listen(3200)
+app.listen(process.env['PORT'], ()=>{
+  console.log(`Server has started at http://localhost:${process.env['PORT']}`)
+})
