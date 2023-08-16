@@ -24,10 +24,10 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }))
 
 app.use(cors())
 // <===== User Routes =====>
-app.use('/api/users', userRouter)
+app.use('/api/users', cacheMiddleware ,userRouter)
 app.use('/api/sections',setCurrentUser ,sectionsRouter)
 app.use('/api/attempts',setCurrentUser, cacheMiddleware, attemptRouter)
-app.use('/api/question',setCurrentUser ,questionRouter)
+app.use('/api/question',setCurrentUser, cacheMiddleware, questionRouter)
 app.use('/api/question-papers',setCurrentUser ,questionPaperRouter)
 
 app.use(errorHandler)
