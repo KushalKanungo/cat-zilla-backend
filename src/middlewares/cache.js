@@ -7,7 +7,7 @@ function sleep(ms) {
 
 async function cacheMiddleware(req, res, next) {
     if (process.env.IS_CACHING_ENABLED !== 'yes') {
-        await sleep(2000)
+        // await sleep(2000)
         return next() 
     }
     
