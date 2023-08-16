@@ -31,4 +31,6 @@ app.use('/api/question',setCurrentUser, cacheMiddleware, questionRouter)
 app.use('/api/question-papers',setCurrentUser ,questionPaperRouter)
 
 app.use(errorHandler)
-app.listen(3200)
+app.listen(process.env['PORT'], ()=>{
+  console.log(`Server has started at http://localhost:${process.env['PORT']}`)
+})

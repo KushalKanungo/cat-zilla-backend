@@ -5,8 +5,7 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "devStart": "nodemon server.js",
-        "start": "node server.js",
+        "start": "nodemon server.js --host 0.0.0.0",
         "debug": "nodemon --inspect server.js"
     },
     "author": "kushal",
