@@ -12,7 +12,7 @@ const errorHandler = (err, req, res, next) => {
             message: errorMessages.join('\n'),
         })
     } else {
-        console.error(err.message)
+        console.error(err)
         res.status(err.statusCode).json({
             message: err.message,
         })

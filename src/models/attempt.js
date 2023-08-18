@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const StatusEnum = require('../_enums/status')
 const QuestionPaperModel = require('./questionPaper')
+const ResultModel = require('./result')
 
 const QuestionSchema = new mongoose.Schema(
     {
@@ -53,21 +54,23 @@ const AttemptSchema = new mongoose.Schema(
     { timestamps: true }
 )
 
-
 AttemptSchema.post('save', async function (doc, next) {
     const attempt = doc
-    await QuestionPaperModel.updateOne({ _id: attempt.questionPaper }, { $push: { attempts: attempt._id } })
+    await QuestionPaperModel.updateOne(
+        { _id: attempt.questionPaper },
+        { $push: { attempts: attempt._id } }
+    )
     next()
 })
-
 
 AttemptSchema.post('findOneAndDelete', async function (doc, next) {
     const attempt = doc
-    await QuestionPaperModel.updateOne({ _id: attempt.questionPaper }, { $pull: { attempts: attempt._id } })
+    await QuestionPaperModel.updateOne(
+        { _id: attempt.questionPaper },
+        { $pull: { attempts: attempt._id } }
+    )
+    await ResultModel.deleteOne({ attempt: attempt._id })
     next()
 })
-
-
-
 
 module.exports = mongoose.model('Attempts', AttemptSchema)

@@ -1,4 +1,5 @@
 const attempt = (attempt) => {
+    console.log('Attempt Serializer')
     let questions = []
     let sections = []
     attempt.sections.forEach((section) => {
@@ -14,26 +15,29 @@ const attempt = (attempt) => {
         }
         section.questions.forEach((question) => {
             let isCorrect
-            if (question['userResponse'] === null || question['userResponse'] === undefined) {
+            if (
+                question['userResponse'] === null ||
+                question['userResponse'] === undefined
+            ) {
                 isCorrect = null
-            }
-            else if (question.question.questionType.label.toUpperCase() === 'MCQ') {
-                isCorrect = question.userResponse === null
-                    ? null
-                    : question.question.options[
-                        Number(question.userResponse)
-                    ]?.isCorrect
-            }
-            else { 
-                
+            } else if (
+                question.question.questionType.label.toUpperCase() === 'MCQ'
+            ) {
+                isCorrect =
+                    question.userResponse === null
+                        ? null
+                        : question.question.options[
+                              Number(question.userResponse)
+                          ]?.isCorrect
+            } else {
                 const matches = question.question.options
                     .find((option) => option.isCorrect)
                     .option.match(/>(\d+)</)
-                isCorrect = question.userResponse === null
-                    ? null
-                    : Number(question.userResponse) === Number(matches?.[1])
+                isCorrect =
+                    question.userResponse === null
+                        ? null
+                        : Number(question.userResponse) === Number(matches?.[1])
             }
-
             const tempQuestion = {
                 id: question.question._id,
                 sectionId: question.question.section._id,
@@ -44,11 +48,11 @@ const attempt = (attempt) => {
                 areaId: question.question.area._id,
                 areaName: question.question.area.label,
                 subjectId: question.question.subject._id,
-                questionType: question.question.questionType.label ?? 'false', 
+                questionType: question.question.questionType.label ?? 'false',
                 subjectName: question.question.subject.label,
                 timeSpent: question.timeSpent,
                 userResponse: question.userResponse ?? null,
-                isCorrect: isCorrect
+                isCorrect: isCorrect,
             }
             tempQuestion.marks = tempQuestion.isCorrect
                 ? question.question.marks
@@ -79,22 +83,17 @@ const attempt = (attempt) => {
     }
 }
 
-const attempListing = (attempts,
-    per,
-    page,
-    total) => {
-
-        const attemptsData = attempts.map((attempt) => {
-            return {
-                id: attempt._id,
-                label: attempt.label,
-                questionPaperName: attempt.questionPaper.label,
-                questionPaperId: attempt.questionPaper.id,
-                createdAt: attempt.createdAt,
-            }
-        })
-        return { attempts: attemptsData, total, per, page }
-
+const attempListing = (attempts, per, page, total) => {
+    const attemptsData = attempts.map((attempt) => {
+        return {
+            id: attempt._id,
+            label: attempt.label,
+            questionPaperName: attempt.questionPaper.label,
+            questionPaperId: attempt.questionPaper.id,
+            createdAt: attempt.createdAt,
+        }
+    })
+    return { attempts: attemptsData, total, per, page }
 }
 
 module.exports = { attempt, attempListing }
