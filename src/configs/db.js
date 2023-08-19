@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const MONGODB_URI = process.env.MONGODB_URI
 
 const connectDB = () => {
-    console.log('connect started')
+    console.log('Connecting to db started.')
     mongoose
         .connect(MONGODB_URI, {
             useNewUrlParser: true,
