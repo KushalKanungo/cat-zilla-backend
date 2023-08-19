@@ -5,7 +5,16 @@ const cacheMiddleware = require('../middlewares/cache')
 
 // <======= Index Route =====>
 router.get('/:id', cacheMiddleware.cacheMiddleware, attemptController.getResult)
-router.delete('/:id', cacheMiddleware.cacheMiddleware, attemptController.deleteResults)
+router.delete(
+    '/:id',
+    cacheMiddleware.cacheMiddleware,
+    attemptController.deleteResults
+)
+router.get(
+    '/preview/:id',
+    cacheMiddleware.cacheMiddleware,
+    attemptController.getResultForPreview
+)
 
 // <====== Get All results ======>
 router.get('/', attemptController.getAllResults)

@@ -95,6 +95,30 @@ const getResult = async (req, res, next) => {
     }
 }
 
+const getResultForPreview = async (req, res, next) => {
+    let processedResult = await ResultModel.findOne({
+        attempt: req.params.id,
+    })
+        .populate({ path: 'questions', populate: 'id' })
+        .populate({ path: 'sections', populate: 'sectionId' })
+        .exec()
+
+    processedResult = processedResult.toJSON()
+    processedResult.questions = processedResult.questions.map((ques) => {
+        let newObj = { ...ques.id, ...ques }
+        delete newObj.id
+        return newObj
+    })
+    processedResult.sections = processedResult.sections.map((sec) => {
+        console.log(sec.sectionId)
+        let newObj = { ...sec.sectionId, ...sec }
+        delete newObj.sectionId
+        // console.log(newObj.sectionId)
+        return newObj
+    })
+    return res.status(200).json(processedResult)
+}
+
 const getAllResults = async (req, res, next) => {
     try {
         const { page = 1, per = 12 } = req.query
@@ -119,4 +143,10 @@ const deleteResults = async (req, res, next) => {
         return next(error)
     }
 }
-module.exports = { setResponse, getResult, getAllResults, deleteResults }
+module.exports = {
+    setResponse,
+    getResult,
+    getAllResults,
+    deleteResults,
+    getResultForPreview,
+}
