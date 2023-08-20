@@ -6,6 +6,7 @@ function sleep(ms) {
 }
 
 async function cacheMiddleware(req, res, next) {
+
     if (process.env.IS_CACHING_ENABLED !== 'yes') { return next() }
     
     const cachedData = myCache.get(req.originalUrl)

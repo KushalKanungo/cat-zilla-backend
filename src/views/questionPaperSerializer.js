@@ -1,15 +1,27 @@
-const { questionWhileAttempt } = require('./section/questionSerializer')
+const {
+    questionWhileAttempt,
+    questionWhilePreview,
+} = require('./section/questionSerializer')
 const { sectionForAttempt } = require('./section/sectionSerializer')
 
-const questionPaperForAttempt = (questionPaper, sections, maxTime) => {
+const questionPaperForAttempt = (
+    questionPaper,
+    sections,
+    maxTime,
+    forPreview = false
+) => {
     const serializedQuestions = questionPaper.questions.map((question) =>
-        questionWhileAttempt(question)
+        forPreview
+            ? questionWhilePreview(question)
+            : questionWhileAttempt(question)
     )
     const serializedSections = sections.map((section) =>
         sectionForAttempt(
             section,
             serializedQuestions.filter((ques) => ques.sectionId == section.id),
-            maxTime))
+            maxTime
+        )
+    )
     return {
         id: questionPaper.id,
         label: questionPaper.label,
@@ -28,7 +40,8 @@ const questionPaperListing = (questionPapers, per, page, total) => {
             hard: questionPaper.hard,
             unknown: questionPaper.unknown,
             attempted: questionPaper.attempts?.length > 0,
-            attemptId: questionPaper.attempts[questionPaper.attempts?.length - 1],
+            attemptId:
+                questionPaper.attempts[questionPaper.attempts?.length - 1],
             description: questionPaper.description,
             createdAt: questionPaper.createdAt,
         }

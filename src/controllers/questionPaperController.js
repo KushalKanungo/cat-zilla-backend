@@ -57,10 +57,11 @@ const getQuestionPaper = async (req, res, next) => {
         const { page = 1, per = 12 } = req.query
         const total = await QuestionPaper.find({}).count()
 
-        const questions = await QuestionPaper.find({}).populate({
-            path: 'attempts',
-            match: { user: req.user._id }
-          })
+        const questions = await QuestionPaper.find({})
+            .populate({
+                path: 'attempts',
+                match: { user: req.user._id },
+            })
             .skip((page - 1) * per)
             .limit(per)
         res.json(
@@ -78,9 +79,10 @@ const getQuestionPaper = async (req, res, next) => {
 
 const paper = async (req, res, next) => {
     try {
-        const serializedData = await QuestionPaperService.questionPaperForTest(
-            {...req.body, user: req.user}
-        )
+        const serializedData = await QuestionPaperService.questionPaperForTest({
+            ...req.body,
+            user: req.user,
+        })
         res.json(serializedData)
     } catch (error) {
         next(error)

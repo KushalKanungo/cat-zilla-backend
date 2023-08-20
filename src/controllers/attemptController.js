@@ -1,29 +1,39 @@
 const AttemptModel = require('../models/attempt')
+const ResultModel = require('../models/result')
 const AttemptService = require('../services/attemptService')
 const myCache = require('../utils/cache')
 const ErrorHandeler = require('../utils/errorHandeler')
 const attemptSeializer = require('../views/attempt/attempSerializer')
 const Status = require('../_enums/status')
+const { questionPaperForTest } = require('../services/questionPaperService')
 
 const setResponse = async (req, res, next) => {
-    const { type } = req.body
-    if(type === 'question'){
-        await setQuestionResponse(req.body)
-        console.log('Question response saved')
+    try {
+        const { type } = req.body
+        if (type === 'question') {
+            await setQuestionResponse(req.body)
+            console.log('Question response saved')
+        } else if (type === 'section') {
+            await setSectionResponse(req.body)
+            console.log('Section response saved')
+        } else if (type === 'questionPaper') {
+            await setQuestionPaperResponse(req.body)
+        }
+        res.status(201).json({ message: 'Updated successfully' })
+    } catch (error) {
+        next(error)
     }
-    else if(type === 'section'){
-        await setSectionResponse(req.body)
-        console.log('Section response saved')
-
-    }
-    else if(type === 'questionPaper'){
-        await setQuestionPaperResponse(req.body)
-    }
-    res.status(201).json({ message: 'Updated successfully' })
-
 }
 
-const setQuestionResponse = async ({ attemptId, sectionId, questionId, status, timeSpent, userResponse }) => {
+const setQuestionResponse = async ({
+    attemptId,
+    sectionId,
+    questionId,
+    status,
+    timeSpent,
+    userResponse,
+}) => {
+    debugger
     await AttemptModel.findOneAndUpdate(
         { _id: attemptId },
         {
@@ -31,7 +41,8 @@ const setQuestionResponse = async ({ attemptId, sectionId, questionId, status, t
                 'sections.$[section].questions.$[question].userResponse':
                     userResponse,
                 'sections.$[section].questions.$[question].status': status,
-                'sections.$[section].questions.$[question].timeSpent': timeSpent,
+                'sections.$[section].questions.$[question].timeSpent':
+                    timeSpent,
             },
         },
         {
@@ -49,31 +60,65 @@ const setSectionResponse = async ({ attemptId, sectionId, timeSpent }) => {
         {
             $set: {
                 'sections.$[section].timeSpent': timeSpent,
-                'sections.$[section].status': Status.DONE
-            }
+                'sections.$[section].status': Status.DONE,
+            },
         },
         {
-            arrayFilters: [
-                { 'section.section': sectionId },
-            ],
+            arrayFilters: [{ 'section.section': sectionId }],
         }
-
     )
 }
 
 const setQuestionPaperResponse = async ({ attemptId }) => {
     await AttemptModel.findOneAndUpdate(
         { _id: attemptId },
-        { $set: { status: Status.DONE }}
-        )
+        { $set: { status: Status.DONE } }
+    )
 }
 
 const getResult = async (req, res, next) => {
     try {
+        const processedResult = await ResultModel.findOne({
+            attempt: req.params.id,
+        })
+        if (processedResult) {
+            console.log('Cached Result')
+            return res.status(200).json(processedResult)
+        }
         const result = await AttemptService.getResult(req.params.id)
         const serialized = attemptSeializer.attempt(result)
-        myCache.set(req.originalUrl, JSON.stringify(serialized))
+        const processed = new ResultModel({
+            ...serialized,
+            user: req.user.id,
+            attempt: req.params.id,
+            questionPaper: result.questionPaper,
+        })
+        processed.save()
+        // myCache.set(req.originalUrl, JSON.stringify(serialized))
         res.status(200).json(serialized)
+    } catch (error) {
+        next(error)
+    }
+}
+
+const getResultForPreview = async (req, res, next) => {
+    try {
+        const attemptId = req.params.id
+        const result = await AttemptModel.findOne({
+            _id: attemptId,
+            user: req.user._id,
+        }).select(['questionPaper', 'sections.section'])
+        if (!result) {
+            throw new ErrorHandeler('Result not found', 400)
+        }
+        const serializedPaper = await questionPaperForTest({
+            id: result.questionPaper,
+            sections: result.sections.map((sec) => String(sec.section)),
+            user: req.user,
+            forPreview: true,
+        })
+        console.log(serializedPaper)
+        return res.status(200).json(serializedPaper)
     } catch (error) {
         next(error)
     }
@@ -82,30 +127,31 @@ const getResult = async (req, res, next) => {
 const getAllResults = async (req, res, next) => {
     try {
         const { page = 1, per = 12 } = req.query
-        const total = await AttemptModel.find({user: req.user}).count()
+        const total = await AttemptModel.find({ user: req.user }).count()
 
-        const questions = await AttemptModel.find({ user: req.user }).populate(['questionPaper']).sort('-createdAt')
+        const questions = await AttemptModel.find({ user: req.user })
+            .populate(['questionPaper'])
+            .sort('-createdAt')
             .skip((page - 1) * per)
             .limit(per)
-        res.json(
-            attemptSeializer.attempListing(
-                questions,
-                per,
-                page,
-                total
-            )
-        )
+        res.json(attemptSeializer.attempListing(questions, per, page, total))
     } catch (error) {
         next(error)
     }
 }
 
-const deleteResults = async (req,res, next) => {
+const deleteResults = async (req, res, next) => {
     try {
         await AttemptModel.findOneAndDelete({ _id: req.params.id })
-        res.status(201).json({message: 'Deleted Successfully'})
+        res.status(201).json({ message: 'Deleted Successfully' })
     } catch (error) {
         return next(error)
     }
 }
-module.exports = { setResponse, getResult, getAllResults, deleteResults }
+module.exports = {
+    setResponse,
+    getResult,
+    getAllResults,
+    deleteResults,
+    getResultForPreview,
+}
