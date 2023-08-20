@@ -1,5 +1,5 @@
 const attempt = (attempt) => {
-    console.log('Attempt Serializer')
+    console.log('Processing Result')
     let questions = []
     let sections = []
     attempt.sections.forEach((section) => {

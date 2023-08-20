@@ -5,19 +5,24 @@ const myCache = require('../utils/cache')
 const ErrorHandeler = require('../utils/errorHandeler')
 const attemptSeializer = require('../views/attempt/attempSerializer')
 const Status = require('../_enums/status')
+const { questionPaperForTest } = require('../services/questionPaperService')
 
 const setResponse = async (req, res, next) => {
-    const { type } = req.body
-    if (type === 'question') {
-        await setQuestionResponse(req.body)
-        console.log('Question response saved')
-    } else if (type === 'section') {
-        await setSectionResponse(req.body)
-        console.log('Section response saved')
-    } else if (type === 'questionPaper') {
-        await setQuestionPaperResponse(req.body)
+    try {
+        const { type } = req.body
+        if (type === 'question') {
+            await setQuestionResponse(req.body)
+            console.log('Question response saved')
+        } else if (type === 'section') {
+            await setSectionResponse(req.body)
+            console.log('Section response saved')
+        } else if (type === 'questionPaper') {
+            await setQuestionPaperResponse(req.body)
+        }
+        res.status(201).json({ message: 'Updated successfully' })
+    } catch (error) {
+        next(error)
     }
-    res.status(201).json({ message: 'Updated successfully' })
 }
 
 const setQuestionResponse = async ({
@@ -28,6 +33,7 @@ const setQuestionResponse = async ({
     timeSpent,
     userResponse,
 }) => {
+    debugger
     await AttemptModel.findOneAndUpdate(
         { _id: attemptId },
         {
@@ -76,7 +82,7 @@ const getResult = async (req, res, next) => {
             attempt: req.params.id,
         })
         if (processedResult) {
-            console.log('cached')
+            console.log('Cached Result')
             return res.status(200).json(processedResult)
         }
         const result = await AttemptService.getResult(req.params.id)
@@ -96,27 +102,26 @@ const getResult = async (req, res, next) => {
 }
 
 const getResultForPreview = async (req, res, next) => {
-    let processedResult = await ResultModel.findOne({
-        attempt: req.params.id,
-    })
-        .populate({ path: 'questions', populate: 'id' })
-        .populate({ path: 'sections', populate: 'sectionId' })
-        .exec()
-
-    processedResult = processedResult.toJSON()
-    processedResult.questions = processedResult.questions.map((ques) => {
-        let newObj = { ...ques.id, ...ques }
-        delete newObj.id
-        return newObj
-    })
-    processedResult.sections = processedResult.sections.map((sec) => {
-        console.log(sec.sectionId)
-        let newObj = { ...sec.sectionId, ...sec }
-        delete newObj.sectionId
-        // console.log(newObj.sectionId)
-        return newObj
-    })
-    return res.status(200).json(processedResult)
+    try {
+        const attemptId = req.params.id
+        const result = await AttemptModel.findOne({
+            _id: attemptId,
+            user: req.user._id,
+        }).select(['questionPaper', 'sections.section'])
+        if (!result) {
+            throw new ErrorHandeler('Result not found', 400)
+        }
+        const serializedPaper = await questionPaperForTest({
+            id: result.questionPaper,
+            sections: result.sections.map((sec) => String(sec.section)),
+            user: req.user,
+            forPreview: true,
+        })
+        console.log(serializedPaper)
+        return res.status(200).json(serializedPaper)
+    } catch (error) {
+        next(error)
+    }
 }
 
 const getAllResults = async (req, res, next) => {

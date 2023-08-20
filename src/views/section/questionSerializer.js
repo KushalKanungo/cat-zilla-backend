@@ -18,6 +18,24 @@ const questionWhileAttempt = (question) => {
     }
 }
 
+const questionWhilePreview = (question) => {
+    return {
+        id: question.id,
+        passage: question.passage,
+        question: question.question,
+        explanation: question.explanation,
+        sectionId: question.section,
+        quesType: question.questionType.label,
+        timeSpent: 0,
+        options: question.options.map((option) => ({
+            id: option.index,
+            value: option.option,
+            isCorrect: option.isCorrect,
+        })),
+    }
+}
+
 module.exports = {
     questionWhileAttempt,
+    questionWhilePreview,
 }
