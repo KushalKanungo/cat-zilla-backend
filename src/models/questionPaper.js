@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const QuestionModel = require('./question')
 
 const QuestionPaperSchema = new mongoose.Schema(
     {
@@ -13,4 +14,16 @@ const QuestionPaperSchema = new mongoose.Schema(
     },
     { timestamps: true }
 )
+
+// QuestionPaperSchema.pre('findOneAndDelete', async function (doc, next) {
+//     const attempt = doc
+//     await QuestionModel.deleteMany({  })
+//     await Question.updateOne(
+//         { _id: attempt.questionPaper },
+//         { $pull: { attempts: attempt._id } }
+//     )
+//     await ResultModel.deleteOne({ attempt: attempt._id })
+//     next()
+// })
+
 module.exports = mongoose.model('QuestionPapers', QuestionPaperSchema)

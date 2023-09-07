@@ -1,19 +1,20 @@
 require('dotenv').config()
 const mongoose = require('mongoose')
+const { logger } = require('../helpers/logger')
 
 // eslint-disable-next-line no-undef
 const MONGODB_URI = process.env.MONGODB_URI
 
 const connectDB = () => {
-    console.log('Connecting to db started.')
+    logger('<====Connecting to db started.===>')
     mongoose
         .connect(MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            dbName: 'cat_zilla'
+            dbName: 'cat_zilla',
         })
         .then(() => {
-            console.log('Connected to MongoDB')
+            logger('<============Connected to MongoDB============>')
         })
         .catch((err) => {
             console.log(err)

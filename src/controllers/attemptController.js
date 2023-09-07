@@ -6,16 +6,17 @@ const ErrorHandeler = require('../utils/errorHandeler')
 const attemptSeializer = require('../views/attempt/attempSerializer')
 const Status = require('../_enums/status')
 const { questionPaperForTest } = require('../services/questionPaperService')
+const { logger } = require('../helpers/logger')
 
 const setResponse = async (req, res, next) => {
     try {
         const { type } = req.body
         if (type === 'question') {
             await setQuestionResponse(req.body)
-            console.log('Question response saved')
+            logger('Question response saved')
         } else if (type === 'section') {
             await setSectionResponse(req.body)
-            console.log('Section response saved')
+            logger('Section response saved')
         } else if (type === 'questionPaper') {
             await setQuestionPaperResponse(req.body)
         }
@@ -82,7 +83,7 @@ const getResult = async (req, res, next) => {
             attempt: req.params.id,
         })
         if (processedResult) {
-            console.log('Cached Result')
+            logger('Cached Result')
             return res.status(200).json(processedResult)
         }
         const result = await AttemptService.getResult(req.params.id)
@@ -117,7 +118,7 @@ const getResultForPreview = async (req, res, next) => {
             user: req.user,
             forPreview: true,
         })
-        console.log(serializedPaper)
+        logger(serializedPaper)
         return res.status(200).json(serializedPaper)
     } catch (error) {
         next(error)
