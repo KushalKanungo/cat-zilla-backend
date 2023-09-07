@@ -2,6 +2,7 @@ const User = require('../models/user')
 const { generateToken, decryptToken } = require('../helpers/jwt')
 const jwt = require('jsonwebtoken')
 const ErrorHandler = require('../utils/errorHandeler')
+const { logger } = require('../helpers/logger')
 
 const setCurrentUser = async (req, res, next) => {
     try {
@@ -14,7 +15,7 @@ const setCurrentUser = async (req, res, next) => {
         if (decoded) {
             const user = await User.findOne({ _id: decoded.id })
             req.user = user
-            console.log(user._id)
+            logger(user._id)
             next()
         }
     } catch (err) {
@@ -22,7 +23,6 @@ const setCurrentUser = async (req, res, next) => {
             const newToken = refreshExpiredToken(token)
             // return res.status(401).json({ message: "Session Expired" })
             return next(new ErrorHandler('Session Expired', 401))
-
         } else if (err instanceof jwt.JsonWebTokenError) {
             return next(new ErrorHandler('You are not authorized', 401))
         }

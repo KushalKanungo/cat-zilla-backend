@@ -8,8 +8,11 @@ const QuestionPaper = require('../models/questionPaper')
 const QuestionPaperService = require('../services/questionPaperService')
 const QuestionPaperSerializer = require('../views/questionPaperSerializer')
 const ErrorHandler = require('../utils/errorHandeler')
+const { default: mongoose } = require('mongoose')
 
 const addQuestionPaper = async (req, res, next) => {
+    const session = await mongoose.startSession()
+    session.startTransaction()
     try {
         const { label, questions, description } = req.body
         let easy = 0
@@ -47,17 +50,25 @@ const addQuestionPaper = async (req, res, next) => {
         await questionPaper.save()
         res.status(201).json({ message: 'Question paper added successfully. ' })
     } catch (err) {
+        await session.abortTransaction()
+        console.error(error)
         const error = new ErrorHandler('File is not valid', 400)
         return next(error)
+    } finally {
+        session.endSession()
     }
 }
 
 const getQuestionPaper = async (req, res, next) => {
     try {
-        const { page = 1, per = 12 } = req.query
-        const total = await QuestionPaper.find({}).count()
+        const { page = 1, per = 12, query = '' } = req.query
+        const searchQuery =
+            query?.length > 0
+                ? { label: { $regex: new RegExp(query, 'i') } }
+                : {}
+        const total = await QuestionPaper.find(searchQuery).count()
 
-        const questions = await QuestionPaper.find({})
+        const questionPapers = await QuestionPaper.find(searchQuery)
             .populate({
                 path: 'attempts',
                 match: { user: req.user._id },
@@ -66,7 +77,7 @@ const getQuestionPaper = async (req, res, next) => {
             .limit(per)
         res.json(
             QuestionPaperSerializer.questionPaperListing(
-                questions,
+                questionPapers,
                 per,
                 page,
                 total

@@ -2,6 +2,7 @@ const { generateToken } = require('../helpers/jwt')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const ErrorHandler = require('../utils/errorHandeler')
+const { logger } = require('../helpers/logger')
 
 const index = async (req, res) => {
     const allUsers = await User.find({}).select(['email', 'username'])
@@ -31,13 +32,10 @@ const signIn = async (req, res, next) => {
     try {
         const { email = null, username = null, password } = req.query
         const searchQuery = {
-            $or: [
-              { email },
-              { username },
-            ],
-          }
+            $or: [{ email }, { username }],
+        }
         const user = await User.find(searchQuery).limit(1)
-        console.log(user, email, username)
+        logger(user, email, username)
         if (user.length < 1 || password === undefined) {
             return next(
                 new ErrorHandler('Email or Password is incorrect.', 400)

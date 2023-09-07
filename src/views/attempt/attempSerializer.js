@@ -1,5 +1,7 @@
+const { logger } = require('../../helpers/logger')
+
 const attempt = (attempt) => {
-    console.log('Processing Result')
+    logger('Processing Result')
     let questions = []
     let sections = []
     attempt.sections.forEach((section) => {
