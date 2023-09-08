@@ -32,9 +32,7 @@ const attempt = (attempt) => {
                               Number(question.userResponse)
                           ]?.isCorrect
             } else {
-                const matches = question.question.options
-                    .find((option) => option.isCorrect)
-                    .option.match(/>(\d+)</)
+                const matches = answerDetector(question.question.options)
                 isCorrect =
                     question.userResponse === null
                         ? null
@@ -96,6 +94,18 @@ const attempListing = (attempts, per, page, total) => {
         }
     })
     return { attempts: attemptsData, total, per, page }
+}
+
+const answerDetector = (options) => {
+    let matches = options
+        .find((option) => option.isCorrect)
+        .option.match(/>(\d+)</)
+    if (matches === null || matches === undefined || matches?.length < 1) {
+        matches = options
+            .find((option) => option.isCorrect)
+            .option.match(/(\d+)/)
+    }
+    return matches
 }
 
 module.exports = { attempt, attempListing }
