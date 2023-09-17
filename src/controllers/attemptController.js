@@ -7,6 +7,7 @@ const attemptSeializer = require('../views/attempt/attempSerializer')
 const Status = require('../_enums/status')
 const { questionPaperForTest } = require('../services/questionPaperService')
 const { logger } = require('../helpers/logger')
+const questionPaper = require('../models/questionPaper')
 
 const setResponse = async (req, res, next) => {
     try {
@@ -86,17 +87,10 @@ const getResult = async (req, res, next) => {
             logger('Cached Result')
             return res.status(200).json(processedResult)
         }
-        const result = await AttemptService.getResult(req.params.id)
-        const serialized = attemptSeializer.attempt(result)
-        const processed = new ResultModel({
-            ...serialized,
-            user: req.user.id,
-            attempt: req.params.id,
-            questionPaper: result.questionPaper,
-        })
-        processed.save()
+
         // myCache.set(req.originalUrl, JSON.stringify(serialized))
-        res.status(200).json(serialized)
+        const processed = await processResultAndSave(req)
+        res.status(200).json(processed)
     } catch (error) {
         next(error)
     }
@@ -149,10 +143,46 @@ const deleteResults = async (req, res, next) => {
         return next(error)
     }
 }
+
+const getTimeline = async (req, res, next) => {
+    console.log('id', req.user_id)
+    try {
+        const count = await ResultModel.find({ user: req.user._id }).count()
+        const attempts = await ResultModel.find({
+            user: req.user._id,
+        })
+            .populate({
+                path: 'questionPaper',
+                populate: 'label',
+            })
+            .populate({
+                path: 'attempt',
+                populate: 'createdAt',
+            })
+        res.status(201).json(attemptSeializer.timeline(attempts, count))
+    } catch (err) {
+        console.log(err)
+        next(err)
+    }
+}
+
+const processResultAndSave = async (req) => {
+    const result = await AttemptService.getResult(req.params.id)
+    const serialized = attemptSeializer.attempt(result)
+    const processed = new ResultModel({
+        ...serialized,
+        user: req.user.id,
+        attempt: req.params.id,
+        questionPaper: result.questionPaper,
+    })
+    processed.save()
+    return processed
+}
 module.exports = {
     setResponse,
     getResult,
     getAllResults,
     deleteResults,
     getResultForPreview,
+    getTimeline,
 }
