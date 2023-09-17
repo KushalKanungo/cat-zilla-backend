@@ -1,7 +1,7 @@
 const errorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode ?? 500
     err.message = err.message ?? 'Internal Server Error'
-    console.log('name', err.name)
+    console.log('name', err)
     if (err.name === 'ValidationError') {
         res.status(400).json({ message: err.message })
     } else if (err.code === 11000) {

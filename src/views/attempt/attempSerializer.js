@@ -108,4 +108,18 @@ const answerDetector = (options) => {
     return matches
 }
 
-module.exports = { attempt, attempListing }
+const timeline = (results, count) => {
+    const serialized = results.map((result) => ({
+        questionPaper: result.questionPaper.label,
+        total: result.total,
+        correct: result.correct,
+        wrong: result.wrong,
+        unswered: result.unswered,
+        marks: result.marks,
+        maximumMarks: result.maximumMarks,
+        createdAt: result.attempt?.createdAt,
+    }))
+    return { results: serialized, total: count }
+}
+
+module.exports = { attempt, attempListing, timeline }
